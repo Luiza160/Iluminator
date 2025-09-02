@@ -38,7 +38,7 @@ def run(screen, clock):
     running = True
 
     def analisar_perguntas(perguntas, pessoas):
-        alfa = len(perguntas)/2
+        alfa = len(pessoas)/2
         for pergunta in perguntas:
             q1 = pergunta.calcular_q1(pessoas)
             pergunta.beta = abs(alfa-q1)
@@ -55,12 +55,14 @@ def run(screen, clock):
                 running = False
             if event.type == MOUSEBUTTONDOWN and event.button == 1:
                 if rect_sim.collidepoint(mouse_pos):
-                    perguntas.pop(0)
                     pessoas_possiveis = []
                     for pessoa in pessoas:
                         if perguntas[0].atributes[pessoa.nome] == 1:
                             pessoas_possiveis.append(pessoa)
                     pessoas = pessoas_possiveis
+                    perguntas.pop(0)
+                    for pessoa in pessoas:
+                        print(pessoa.nome)
                     
                     print(len(pessoas))
                     print(perguntas[0].nome)
@@ -68,20 +70,25 @@ def run(screen, clock):
                     print(f"alpha = {len(pessoas)/2}")
                     perguntas = analisar_perguntas(perguntas, pessoas)
                     for pergunta in perguntas:
-                        print(pergunta.nome)
+                        print(pergunta.nome, pergunta.beta)
 
-                if rect_talvez_sim.collidepoint(mouse_pos):
-                    perguntas.pop(0)
+                if rect_talvez_sim.collidepoint(mouse_pos): 
                     pessoas_possiveis = []
                     for pessoa in pessoas:
                         if perguntas[0].atributes[pessoa.nome] == 1:
                             pessoas_possiveis.append(pessoa)
                     pessoas = pessoas_possiveis
+                    perguntas.pop(0)
+                    for pessoa in pessoas:
+                        print(pessoa.nome)
                     
                     print(len(pessoas))
                     print(perguntas[0].nome)
                     print(f"q1 = {perguntas[0].calcular_q1(pessoas)}")
                     print(f"alpha = {len(pessoas)/2}")
+                    perguntas = analisar_perguntas(perguntas, pessoas)
+                    for pergunta in perguntas:
+                        print(pergunta.nome, pergunta.beta)
 
                 if rect_nao_sei.collidepoint(mouse_pos):
                     perguntas.pop(0)
@@ -89,32 +96,48 @@ def run(screen, clock):
                     print(perguntas[0].nome)
                     print(f"q1 = {perguntas[0].calcular_q1(pessoas)}")
                     print(f"alpha = {len(pessoas)/2}")
+                    perguntas = analisar_perguntas(perguntas, pessoas)
+                    for pessoa in pessoas:
+                        print(pessoa.nome)
+                    for pergunta in perguntas:
+                        print(pergunta.nome, pergunta.beta)
 
-                if rect_talvez_nao.collidepoint(mouse_pos):
-                    perguntas.pop(0)
+                if rect_talvez_nao.collidepoint(mouse_pos):       
                     pessoas_possiveis = []
                     for pessoa in pessoas:
                         if perguntas[0].atributes[pessoa.nome] == 0:
                             pessoas_possiveis.append(pessoa)
                     pessoas = pessoas_possiveis
+                    perguntas.pop(0)
+
+                    for pessoa in pessoas:
+                        print(pessoa.nome)
                     
                     print(len(pessoas))
                     print(perguntas[0].nome)
                     print(f"q1 = {perguntas[0].calcular_q1(pessoas)}")
                     print(f"alpha = {len(pessoas)/2}")
+                    perguntas = analisar_perguntas(perguntas, pessoas)
+                    for pergunta in perguntas:
+                        print(pergunta.nome, pergunta.beta)
 
                 if rect_nao.collidepoint(mouse_pos):
-                    perguntas.pop(0)
                     pessoas_possiveis = []
                     for pessoa in pessoas:
                         if perguntas[0].atributes[pessoa.nome] == 0:
                             pessoas_possiveis.append(pessoa)
                     pessoas = pessoas_possiveis
+                    perguntas.pop(0)
+                    for pessoa in pessoas:
+                        print(pessoa.nome)
                     
                     print(len(pessoas))
                     print(perguntas[0].nome)
                     print(f"q1 = {perguntas[0].calcular_q1(pessoas)}")
                     print(f"alpha = {len(pessoas)/2}")
+                    perguntas = analisar_perguntas(perguntas, pessoas)
+                    for pergunta in perguntas:
+                        print(pergunta.nome, pergunta.beta)
 
         if len(pessoas) == 1:
             print(f"O seu personagem é: {pessoas[0].nome}")
