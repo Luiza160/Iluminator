@@ -8,13 +8,11 @@ from config import window_width, window_height
 
 pygame.display.set_caption("Iluminator")
 
-def run(screen, clock):
+def adicionar(screen, clock):
     # --- CARREGAR IMAGENS ---
     background = pygame.image.load("Imagens/bg_jogo.png").convert()
     background = pygame.transform.scale(background, (window_width, window_height))
     foreground = pygame.Surface((window_width, window_height), pygame.SRCALPHA)
-    fundo_chute = pygame.image.load("Imagens/fundo_chute.png").convert()
-    fundo_vitoria = pygame.image.load("Imagens/vitoria.png").convert()
     fundo_derrota = pygame.image.load("Imagens/derrota.png").convert()
 
     # Gerar botões
@@ -23,12 +21,6 @@ def run(screen, clock):
     nao_sei = Botao_hover((373, 69), (420, 77), (858, 500), "nao_sei")
     prov_nao = Botao_hover((373, 69), (420, 77), (858, 593), "prov_nao")
     nao = Botao_hover((373, 69), (420, 77), (858, 686), "nao")
-
-    sim_chute = Botao_hover((373, 69), (420, 77), (858, 460), "sim")
-    nao_chute = Botao_hover((373, 69), (420, 77), (858, 553), "nao")
-
-    sim_vitoria = Botao_hover((373, 69), (420, 77), (858, 481), "sim")
-    nao_vitoria = Botao_hover((373, 69), (420, 77), (858, 575), "nao")
 
     enviar = Botao_hover((313, 69), (351, 77), (1044, 696), "enviar")
     sair = Botao_hover((313, 69), (351, 77), (673, 696), "sair")
@@ -109,20 +101,10 @@ def run(screen, clock):
         rendered_lines = [font.render(line.strip(), True, color) for line in lines]
 
         return rendered_lines
-    
-    def calcular_posicoes(textos, x, y):
-        n_linhas = len(textos)
-        pos_linhas =[]
-        for i, linha in enumerate(textos):
-            x_linha = x-linha.get_width()//2
-            y_linha = y-(linha.get_height()*n_linhas)//2 + i*linha.get_height()
-            pos_linhas.append((x_linha, y_linha))
 
-        return pos_linhas
 
     # Guarda as respostas do jogador
     respostas = {}
-    contador = 0
 
     running = True
     state = "plain"
@@ -143,7 +125,7 @@ def run(screen, clock):
                 # SIM
                 if sim.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
-                    respostas[perguntas[0]] = 0.95
+                    respostas[perguntas[0]] = 3
 
                     # Atualiza as probabilidades
                     for pessoa in pessoas:
@@ -161,7 +143,7 @@ def run(screen, clock):
                 # PROVAVELMENTE SIM
                 if prov_sim.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
-                    respostas[perguntas[0]] = 0.75
+                    respostas[perguntas[0]] = 2
 
                     # Atualiza as probabilidades
                     for pessoa in pessoas:
@@ -189,7 +171,7 @@ def run(screen, clock):
                 # PROVAVELMENTE NÃO
                 if prov_nao.rect.collidepoint(mouse_pos):   
                     # Guarda a resposta
-                    respostas[perguntas[0]] = -0.75
+                    respostas[perguntas[0]] = -2
 
                     # Atualiza as probabilidades
                     for pessoa in pessoas:
@@ -207,7 +189,7 @@ def run(screen, clock):
                 # NÃO
                 if nao.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
-                    respostas[perguntas[0]] = -0.95
+                    respostas[perguntas[0]] = -3
 
                     # Atualiza as probabilidades
                     for pessoa in pessoas:
@@ -224,12 +206,6 @@ def run(screen, clock):
 
         # Checa se as probabilidades estão favoráveis para um chute
         pessoas = analisar_pessoas(pessoas)
-        if pessoas[0].prob - pessoas[1].prob > 0.5:
-            chute = pessoas[0].nome
-            state = "adivinhou"
-            textos = quebra_de_linha(f"Seu personagem é {chute}?", fonte, (183, 110, 34), 600)
-            pos_linhas = calcular_posicoes(textos, 868, 303)
-
 
         # Checa se há perguntas disponíveis
         if len(perguntas) > 0:
@@ -250,73 +226,6 @@ def run(screen, clock):
             clock.tick(60)
         else:
             state = "derrota"
-
-        #-----TELA DE CHUTE-----
-        while state == "adivinhou":
-            screen.blit(fundo_chute, (0, 0))    
-            for texto, pos_texto in zip(textos, pos_linhas):
-                screen.blit(texto, pos_texto)
-            sim_chute.draw(screen)
-            nao_chute.draw(screen)
-
-            mouse_pos = pygame.mouse.get_pos()
-
-            for event in pygame.event.get():
-
-                if event.type == QUIT: # Sair do sistema
-                    pygame.quit(); sys.exit()
-
-                if event.type == KEYDOWN and event.key == K_ESCAPE: #ESC
-                    return False
-
-                if event.type == MOUSEBUTTONDOWN and event.button == 1: #Clique com botão esquerdo
-
-                    # SIM
-                    if sim_chute.rect.collidepoint(mouse_pos):
-                        atualizar_dados(respostas, chute)
-                        state = "vitoria"
-                    
-                    # NÃO
-                    if nao_chute.rect.collidepoint(mouse_pos):
-                        contador += 1
-                        if contador >= 10:
-                            state = "derrota"
-                        else:
-                            pessoas[0].prob = 0
-                            state = "plain"
-
-
-            pygame.display.flip()
-            clock.tick(60)
-
-        #-----TELA DE VITÓRIA-----
-        while state == "vitoria":
-            screen.blit(fundo_vitoria, (0, 0))  
-            sim_vitoria.draw(screen)
-            nao_vitoria.draw(screen)  
-
-            mouse_pos = pygame.mouse.get_pos()
-
-            for event in pygame.event.get():
-
-                if event.type == QUIT: # Sair do sistema
-                    pygame.quit(); sys.exit()
-
-                if event.type == KEYDOWN and event.key == K_ESCAPE: #ESC
-                    return False
-
-                if event.type == MOUSEBUTTONDOWN and event.button == 1: #Clique com botão esquerdo
-
-                    # SIM
-                    if sim_vitoria.rect.collidepoint(mouse_pos):
-                        return False
-                    
-                    # NÃO
-                    if nao_vitoria.rect.collidepoint(mouse_pos):
-                        return False
-
-            pygame.display.flip()
-            clock.tick(60)
 
         #-----TELA DE DERROTA-----
         while state == "derrota":

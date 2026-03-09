@@ -1,8 +1,41 @@
 import numpy as np
 import pandas as pd
 import pygame
+from textos import PERGUNTAS
 
 df = pd.read_excel("Dados_Iluminator.xlsx")
+
+def quebra_de_linha(text, font, color, max_width):
+    words = text.split(' ')
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + word + " "
+        test_width, _ = font.size(test_line)
+
+        if test_width <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word + " "
+
+    lines.append(current_line)
+
+    # Renderiza cada linha
+    rendered_lines = [font.render(line.strip(), True, color) for line in lines]
+
+    return rendered_lines
+    
+def calcular_posicoes(textos, x, y):
+    n_linhas = len(textos)
+    pos_linhas =[]
+    for i, linha in enumerate(textos):
+        x_linha = x-linha.get_width()//2
+        y_linha = y-(linha.get_height()*n_linhas)//2 + i*linha.get_height()
+        pos_linhas.append((x_linha, y_linha))
+
+    return pos_linhas
 
 class Botao_hover:
     def __init__(self, tamanho = None, tamanho_hover = None, pos = None, imagem = None):
@@ -18,7 +51,7 @@ class Botao_hover:
         # Calcula posições
         pos_normal = (pos[0]-tamanho[0]//2, pos[1]-tamanho[1]//2) if pos != None else None
         pos_hover = (pos[0]-tamanho_hover[0]//2, pos[1]-tamanho_hover[1]//2) if pos != None else None
-        
+
         # Define os rects (região interativa)
         rect = pygame.Rect(pos_normal, tamanho) if tamanho != None and pos_normal != None else None
         rect_hover =  pygame.Rect(pos_hover, tamanho_hover) if tamanho_hover != None and pos_hover != None else None
@@ -72,8 +105,7 @@ class CaixaTexto:
             if evento.key == pygame.K_BACKSPACE: # Apertou a tecla de apagar
                 self.texto = self.texto[:-1] # Apagar último caractere
             else:
-                # Adicionar caractere (limitar a 18 caracteres)
-                if len(self.texto) < 18:
+                if len(self.texto) < 30:
                     self.texto += evento.unicode
         return False  # Retorna False por padrão
     
@@ -111,10 +143,12 @@ class CaixaTexto:
             
 
 class Pergunta:
-    def __init__(self, df, id):
+    def __init__(self, df, id, fonte, cor):
         self.nome = id
-        self.img = pygame.transform.scale(pygame.image.load(f"Imagens/perguntas/{id}.png"), (666, 194))  
+        #self.img = pygame.transform.scale(pygame.image.load(f"Imagens/perguntas/{id}.png"), (666, 194))  
         self.atributes = self.obter_dicionario_atributo(df, id)
+        self.texto = quebra_de_linha(PERGUNTAS[str(id)], fonte, cor, 640)
+        self.pos = calcular_posicoes(self.texto, 868, 160)
     
     def calcular_q1(self, pessoas):
         q1s = 0
@@ -146,6 +180,10 @@ class Pergunta:
                 nomes_para_valores[nome] = float(valor)  
         
         return nomes_para_valores
+    
+    def draw(self, surface):
+        for texto, pos_texto in zip(self.texto, self.pos):
+           surface.blit(texto, pos_texto)
 
 class Pessoa:
     def __init__(self, df, nome_pessoa, prob):
