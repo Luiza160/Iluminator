@@ -58,7 +58,7 @@ PERGUNTAS = {
     "cabelo_escuro": "Seu personagem tem cabelo escuro?",
     "branco": "Seu personagem é branco?",
     "preto": "Seu personagem é preto?",
-    "asiatico": "Seu personagem possui descendência asiática?",
+    "asiatico": "Seu personagem possui ascendência asiática?",
     "camisa": "Seu personagem é conhecido por usar camisa preta?",
     "bone": "Seu personagem usa boina ou boné?",
 
@@ -96,5 +96,6 @@ PERGUNTAS = {
     "lgbt": "Seu personagem é da comunidade LGBT?",
     "nicho": "Seu personagem é d'O Nicho?",
     "filhos": "Seu personagem tem filhos?",
+    "divulgação": "Seu personagem tem um Instagram de divulgação científica?"
 
 }

@@ -52,21 +52,6 @@ def adicionar(screen, clock):
     for atributo in df.columns[1:]:
         perguntas.append(Pergunta(df, atributo, fonte, (183, 110, 34)))
     
-
-    # Organiza as perguntas por ordem de entropia
-    def analisar_perguntas(perguntas, pessoas):
-        """Coloca as perguntas em ordem de entropia"""
-        for pergunta in perguntas:
-            q1 = pergunta.calcular_q1(pessoas)
-            pergunta.beta = abs(0.5-q1)
-        return sorted(perguntas, key=lambda x: x.beta)
-    
-    perguntas = analisar_perguntas(perguntas, pessoas)
-
-    # Organiza as pessoas por ordem de probabilidade
-    def analisar_pessoas(pessoas):
-        return sorted(pessoas, key=lambda x: x.prob, reverse=True)
-    
     # Atualiza o dataset após o término do jogo
     def atualizar_dados(respostas, pessoa):
         df = pd.read_excel("Dados_Iluminator.xlsx")
@@ -79,29 +64,6 @@ def adicionar(screen, clock):
             df.loc[df["Nome"] == pessoa, pergunta.nome] += respostas[pergunta]
 
         df.to_excel("Dados_Iluminator.xlsx", index=False)
-
-    def quebra_de_linha(text, font, color, max_width):
-        words = text.split(' ')
-        lines = []
-        current_line = ""
-
-        for word in words:
-            test_line = current_line + word + " "
-            test_width, _ = font.size(test_line)
-
-            if test_width <= max_width:
-                current_line = test_line
-            else:
-                lines.append(current_line)
-                current_line = word + " "
-
-        lines.append(current_line)
-
-        # Renderiza cada linha
-        rendered_lines = [font.render(line.strip(), True, color) for line in lines]
-
-        return rendered_lines
-
 
     # Guarda as respostas do jogador
     respostas = {}
@@ -138,8 +100,6 @@ def adicionar(screen, clock):
                     # Remove pergunta e reorganiza
                     perguntas.pop(0)
 
-                    perguntas = analisar_perguntas(perguntas, pessoas)
-
                 # PROVAVELMENTE SIM
                 if prov_sim.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
@@ -156,8 +116,6 @@ def adicionar(screen, clock):
                     # Remove pergunta e reorganiza
                     perguntas.pop(0)
 
-                    perguntas = analisar_perguntas(perguntas, pessoas)
-
                 # NÃO SEI
                 if nao_sei.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
@@ -165,8 +123,6 @@ def adicionar(screen, clock):
 
                     # Remove pergunta e reorganiza
                     perguntas.pop(0)
-
-                    perguntas = analisar_perguntas(perguntas, pessoas)
 
                 # PROVAVELMENTE NÃO
                 if prov_nao.rect.collidepoint(mouse_pos):   
@@ -184,8 +140,6 @@ def adicionar(screen, clock):
                     # Remove pergunta e reorganiza
                     perguntas.pop(0)
 
-                    perguntas = analisar_perguntas(perguntas, pessoas)
-
                 # NÃO
                 if nao.rect.collidepoint(mouse_pos):
                     # Guarda a resposta
@@ -201,11 +155,6 @@ def adicionar(screen, clock):
 
                     # Remove pergunta e reorganiza
                     perguntas.pop(0)
-
-                    perguntas = analisar_perguntas(perguntas, pessoas)
-
-        # Checa se as probabilidades estão favoráveis para um chute
-        pessoas = analisar_pessoas(pessoas)
 
         # Checa se há perguntas disponíveis
         if len(perguntas) > 0:
